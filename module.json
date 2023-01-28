@@ -8,6 +8,13 @@
     }
   ],
   "version": "1.0.0",
+  "compatibility": {
+    "minimum": "9",
+    "verified": "10"
+  },
+  "esmodules": [
+    "./handy-hints.js"
+  ],
   "url": "https://https://github.com/Kiwooki/handy-hints",
   "manifest": "https://raw.githubusercontent.com/Kiwooki/handy-hints/develop/module.json",  
   "download": "https://github.com/Kiwooki/handy-hints/archive/refs/heads/develop.zip"
