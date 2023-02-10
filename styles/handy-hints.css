@@ -1,0 +1,20 @@
+.action-economy {
+  height: var(--sidebar-item-height);
+  width: var(--sidebar-item-height);
+  object-fit: cover;
+  object-position: 50% 0;
+  border: none;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: right;
+}
+
+.economy-3-actions {
+  background-image: url(../assets/3_actions.png);
+}
+.economy-2-actions {
+  background-image: url(../assets/2_actions.png);
+}
+.economy-1-action {
+  background-image: url(../assets/1_action.png);
+}

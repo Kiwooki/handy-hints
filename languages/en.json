@@ -1,0 +1,10 @@
+{
+    "handy-hints": {
+        "settings": {
+            "inject-button": {
+              "Name": "Display Kiwooki's Handy Hints",
+              "Hint": "Controls whether or not handy hints will run on actions during combat."
+            }
+        }
+    }
+}
