@@ -29,22 +29,3 @@
     </section>
     {{/each}}
 </section>
-<!-- <script>
-    var internalDNDType = 'text/x-example'; // set this to something specific to your site
-    function dragStartHandler(event) {
-      if (event.target instanceof HTMLLIElement) {
-        console.log("li element")
-        // use the element's data-value="" attribute as the value to be moving:
-        event.dataTransfer.setData(internalDNDType, event.target.dataset.value);
-        event.effectAllowed = 'move'; // only allow moves
-        console.log("moving")
-      } else {
-        console.log("not an LI Element")
-        event.preventDefault(); // don't allow selection to be dragged
-        console.log("not moving...")
-        event.dataTransfer.setData(internalDNDType, event.target.dataset.value);
-        event.effectAllowed = 'move'; // only allow moves
-        console.log("move anyway.")
-      }
-    }
-  </script> -->
