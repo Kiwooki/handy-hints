@@ -1,3 +1,4 @@
+import { CharacterCreator } from './scripts/character-creator.js';
 import { ChatParser } from './scripts/parse-chat.js'
 
 class HandyHints
@@ -128,7 +129,7 @@ class CurrentActor
 
 Hooks.on("init", async function () {
     HandyHints.initialize()
-    // CONFIG.debug.hooks = true;
+    CONFIG.debug.hooks = true;
 });
 
 Hooks.on("pf2e.startTurn", ( combatant, encounter ) => {
@@ -159,6 +160,7 @@ Hooks.on("renderChatMessage", (chatMessagePF2E, html) => {
     let action = parser.action
     CurrentActor.consumeAction(my_id, action, action.action_cost)
 });
+
 
 Hooks.on("preUpdateItem", ( itemPF2E ) => {
     if (!game.settings.get(HandyHints.ID, HandyHints.SETTINGS.INJECT_BUTTON)) {
@@ -210,13 +212,11 @@ Hooks.on("renderCombatTracker", (tracker, html, css) => {
         return
     }
     let my_id = combatant.id
-    // console.log("lookup id: " + my_id)
     const combatantItem = html.find(`[data-combatant-id="${my_id}"]`)
     let inner_row = combatantItem.find(`[class="token-name flexcol"]`)
     inner_row.after(
         "<div class='action-economy economy-3-actions' id='actions-remaining'></div>"
     );
-    // console.log("combatant item added.")
     HandyHints.set_combat_tracker(html)
 });
 
@@ -232,3 +232,24 @@ Hooks.on("renderCombatTracker", (tracker, html, css) => {
 // Hooks.on('deleteCombat', async () => {
 //     await Marker.clearAllMarkers();
 // });
+
+Hooks.on("renderCharacterSheetPF2e", (character_sheet, character_html, css_class) => {
+    console.log(character_sheet)
+    console.log(character_html)
+    console.log(css_class)
+
+    let header = character_html.find(`[class="header-button close"]`)
+    const tooltip = game.i18n.localize('CHARACTER-CREATOR.button-title');
+    header.before(
+        '<button type="button" class="header-button character-creator-button" title="' + tooltip + '"><i class="fas fa-tasks"></i></button>'
+    );
+
+    // register an event listener for this button
+    character_html.on('click', '.character-creator-button', (event) => {
+        const userId = $(event.currentTarget).parents('[data-user-id]')?.data()?.userId;
+        new CharacterCreator(character_sheet).render(true, { 
+            width: 750,
+            height: 800
+        })
+    });
+});

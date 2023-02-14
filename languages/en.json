@@ -6,5 +6,8 @@
               "Hint": "Controls whether or not handy hints will run on actions during combat."
             }
         }
+    },
+    "CHARACTER-CREATOR": {
+      "button-title": "Open Character Creator/Editor"
     }
 }

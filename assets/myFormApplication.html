@@ -1,0 +1,39 @@
+<form>
+  <section class="sheet-content" style="display: flex;">
+    <section class="sheet-sidebar" style="display: flex; flex-direction: column;">
+      <img class="logo" src="systems/pf2e/assets/pathfinder_logo.webp" height="56" alt="" srcset="">
+      <div class="pc pc_ancestry item" data-item-id="">
+        <span class="details-label">Ancestry</span>
+        <span title="Your character's ancestry">
+            <h3>
+              <a id="chosen_ancestry"></a>
+            </h3>
+        </span>
+    </div>
+    </section>
+    <section class="sheet-body" style="flex: 1 1 0;">
+      <!-- SHEET NAVIGATION -->
+      <nav class="tabs" data-group="primary-tabs">
+        {{#each tabs}}
+        <a class="item" data-tab="{{label}}"><i class="fas fa-dice-d20"></i> {{title}}</a>
+        {{/each}}
+      </nav>
+    
+      <!-- BODY -->
+      <section class="content flexrow">
+        {{#each tabs}}
+        <section class="tab compendium directory" data-tab="{{label}}" data-group="primary-tabs">
+          {{#if ancestry}}
+            {{> 'modules/handy-hints/assets/ancestry.html' this}}
+          {{else if background}}
+            {{> 'modules/handy-hints/assets/background.html' this}}
+          {{else if class}}
+            {{> 'modules/handy-hints/assets/class.html' this}}
+          {{/if}}
+        </section>
+        {{/each}}
+      </section>
+
+    </section>
+  </section>
+</form>
