@@ -13,16 +13,16 @@ export class CharacterCreator extends FormApplication
       const feats_compendium = game.packs.get("pf2e.feats-srd")
       for( const feat_entry of feats_compendium.index )
       {
-        console.log(feat_entry)
         let feat = game.packs.get("pf2e.feats-srd").getDocument(feat_entry._id)
       }
 
       loadTemplates([
-        "modules/handy-hints/assets/settings.html", 
+        "modules/handy-hints/assets/sidebar.html", 
         "modules/handy-hints/assets/ancestry.html", 
         "modules/handy-hints/assets/background.html", 
         "modules/handy-hints/assets/class.html"]);
       const template_data = { title: "Handlebars header text.",
+                              chosen_ancestry: "drag choice here",
                               tabs: [
                                       { 
                                         label: "ancestry",
@@ -45,9 +45,11 @@ export class CharacterCreator extends FormApplication
                                         class: true
                                       }]
                             };
+        let title_name = "Character Builder: " + character_sheet.object.name
         super( 
           template_data, 
           {
+            title: title_name,
             template: template_file,
             tabs: [{navSelector: ".tabs", contentSelector: ".content", initial: "tab1"}],
             resizable: true,
@@ -57,8 +59,37 @@ export class CharacterCreator extends FormApplication
         this.owner_id = owner_id;
       }
     
+      _onDragStart( event ) {
+        if(!event.currentTarget.classList.contains("ancestry-row"))
+        {
+          super._onDragStart(event);
+        }
+
+        const dragData =
+        {
+          type: "Ancestry",
+          id: event.currentTarget.dataset.documentId,
+        }
+        event.dataTransfer.setData('text/plain', JSON.stringify(dragData))
+      }
+
+      async _onDrop(event) {
+        let data;
+        try {
+          data = JSON.parse(event.dataTransfer.getData('text/plain'))
+        } catch (err)
+        {
+          console.log(err)
+          return false;
+        }
+        // TODO if ancestry
+        this._updateObject(event, data)
+      }
+
       static get defaultOptions() {
-        return super.defaultOptions
+        const options = super.defaultOptions;
+        options.dragDrop.push({ dragSelector: ".ancestry-row", dropSelector: null});
+        return options
       }
     
       getData(options = {}) {
@@ -69,22 +100,16 @@ export class CharacterCreator extends FormApplication
         super.activateListeners(html);
 
         html.find('.ancestry-selected').click( async ev => {
-          console.log("something was clicked!!!")
-          console.log(ev)
           let my_ancestry_id = ev.currentTarget.attributes[2].value
-          console.log("ancestry: " + my_ancestry_id)
           let ancestry_sheet = await game.packs.get("pf2e.ancestries").getDocument(my_ancestry_id)
-          console.log(ancestry_sheet)
-          console.log(ancestry_sheet.sheet)
           ancestry_sheet.sheet.render(true)
         });
       }
     
       async _updateObject(event, formData) {
-        // console.log(formData.exampleInput);
-        // this.character_sheet.name = formData.exampleInput
-        // this.character_sheet.object.update({
-        //   name: formData.exampleInput
-        // })
-    }
+        //  TODO filter for ancestry/heritage/class/etc.
+        let data = super.getData().object
+        data.chosen_ancestry = formData.id
+        this.render( true ) // sets value but render fails
+      }
 }

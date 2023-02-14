@@ -1,15 +1,8 @@
 <form>
   <section class="sheet-content" style="display: flex;">
+    <!-- Sidebar / Summary -->
     <section class="sheet-sidebar" style="display: flex; flex-direction: column;">
-      <img class="logo" src="systems/pf2e/assets/pathfinder_logo.webp" height="56" alt="" srcset="">
-      <div class="pc pc_ancestry item" data-item-id="">
-        <span class="details-label">Ancestry</span>
-        <span title="Your character's ancestry">
-            <h3>
-              <a id="chosen_ancestry"></a>
-            </h3>
-        </span>
-    </div>
+      {{> 'modules/handy-hints/assets/sidebar.html' this}}
     </section>
     <section class="sheet-body" style="flex: 1 1 0;">
       <!-- SHEET NAVIGATION -->
