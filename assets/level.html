@@ -1,9 +1,254 @@
-Level tab content.<br>
-This is tab {{title}}.<br>
-{{content}}
-
-<a>something</a>
-<a>something else</a>
-
-<a>something</a>
-<a>something level</a>
+<section class="sheet-body">
+    <button type="button" class="level-accordion">Summary - Ancestry: {{@root.actor.ancestry.name}}</button>
+    <section style="display: none;">
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Ancestry HP</td>
+                <td>{{@root.actor.ancestry.system.hp}}</td>
+            </tr>
+            {{#each @root.actor.ancestry.system.boosts}}
+            <tr>
+                <td>Boost</td>
+                <td>
+                    <select>
+                        {{#each this.value}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </td>
+            </tr>
+            {{/each}}
+            {{#each @root.actor.ancestry.system.flaws}}
+            <tr>
+                <td>Flaw</td>
+                <td>
+                    <select>
+                        {{#each this.value}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </td>
+            </tr>
+            {{/each}}
+            {{#each @root.actor.ancestry.system.items}}
+            <tr class="ancestry-feat" data-id="{{this.uuid}}">
+                <a href="#">
+                    <td>Ancestry Feat</td>
+                    <td><em>{{this.name}}</em></td>
+                </a>
+            </tr>
+            {{/each}}
+            <tr>
+                <td>Languages Known</td>
+                <td>{{@root.actor.ancestry.system.languages.value}}</td>
+            </tr>
+            <tr>
+                <td>Speed</td>
+                <td>{{@root.actor.ancestry.system.speed}}</td>
+            </tr>
+            <tr>
+                <td>Size</td>
+                <td>{{@root.actor.ancestry.system.size}}</td>
+            </tr>
+        </table>
+    </section>
+    <button type="button" class="level-accordion">Summary - Heritage: {{@root.actor.heritage.name}}</button>
+    <section style="display: none;">
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            {{#each @root.actor.heritage.rules}}
+                {{#if this.add}}
+                <tr>
+                    <td>{{this.key}}</td>
+                    <td>{{this.add}}</td>
+                </tr>
+                {{else}}
+                <tr>
+                    <td>{{this.key}}</td>
+                    <td>{{this.selector}}</td>
+                </tr>
+                {{/if}}
+            {{/each}}
+        </table>
+    </section>
+    <button type="button" class="level-accordion">Summary - Background: {{@root.actor.background.name}}</button>
+    <section style="display: none;">
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            {{#each @root.actor.background.system.boosts}}
+            <tr>
+                <td>Boost</td>
+                <td>
+                    <select>
+                        {{#each this.value}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </td>
+            </tr>
+            {{/each}}
+            {{#each @root.actor.background.trainedSkills.system.boosts}}
+            <tr>
+                <td>Boost</td>
+                <td>
+                    <select>
+                        {{#each this.value}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </td>
+            </tr>
+            {{/each}}
+            {{#each @root.actor.background.system.items}}
+            <tr class="background-feat" data-id="{{this.uuid}}">
+                <a href="#">
+                    <td>Background Feat</td>
+                    <td><em>{{this.name}}</em></td>
+                </a>
+            </tr>
+            {{/each}}
+        </table>
+    </section>
+    <button type="button" class="level-accordion">Summary - Class: {{@root.actor.class.name}}</button>
+    <section style="display: none;">
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Class HP</td>
+                <td>{{@root.actor.class.system.hp}}</td>
+            </tr>
+            <tr>
+                <td>Key Ability</td>
+                <td>
+                    <select>
+                        {{#each @root.actor.class.system.keyAbility.value}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Ancestry Feat Levels</td>
+                <td>{{@root.actor.class.system.ancestryFeatLevels.value}}</td>
+            </tr>
+            <tr>
+                <td>Class Feat Levels</td>
+                <td>{{@root.actor.class.system.classFeatLevels.value}}</td>
+            </tr>
+            <tr>
+                <td>General Feat Levels</td>
+                <td>{{@root.actor.class.system.generalFeatLevels.value}}</td>
+            </tr>
+            <tr>
+                <td>Skill Feat Levels</td>
+                <td>{{@root.actor.class.system.skillFeatLevels.value}}</td>
+            </tr>
+            <tr>
+                <td>Skill Increase Levels</td>
+                <td>{{@root.actor.class.system.skillIncreaseLevels.value}}</td>
+            </tr>
+            <tr>
+                <td>Ability Boost Levels</td>
+                <td>{{@root.ability_boosts}}</td>
+            </tr>
+        </table>
+    </section>
+    <!-- <button type="button" class="level-accordion">Level 1</button>
+    <section style="display: none;">
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            {{#each @root.actor.class.system.items}}
+            {{#ifCond this.level 1}}
+            <tr>
+                <td>Class Feature</td>
+                <td>{{this.name}}</td>
+            </tr>
+            {{/ifCond}}
+            {{/each}}
+        </table>
+    </section> -->
+    {{#each character_level}}
+    <button type="button" class="level-accordion">Level {{this}}</button>
+    <section style="display: none;">
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            {{#each @root.actor.class.system.items}}
+                {{#ifCond this.level @../this}}
+                <tr class="class-feature" data-id="{{this.uuid}}">
+                    <td>Class Feature</td>
+                    <td><em>{{this.name}}</em></td>
+                </tr>
+                {{/ifCond}}
+            {{/each}}
+            {{#if (contains @root.actor.class.system.ancestryFeatLevels.value this)}}
+            <tr class="ancestry-feat-select" data-id="{{@root.actor.ancestry._id}}"> 
+                <!-- TODO if empty -->
+                <a href="#">
+                    <td>Ancestry Feat</td>
+                    <td>_Pick Ancestry Feat_</td>
+                    <!-- <td>INSERT ANCESTRY FEAT HERE IF ALREADY SELECTED</td> -->
+                </a>
+            </tr>
+            {{/if}}
+            {{#if (contains @root.actor.class.system.classFeatLevels.value this)}}
+            <tr>
+                <td>INSERT CLASS FEAT HERE</td>
+            </tr>
+            {{/if}}
+            {{#if (contains @root.actor.class.system.generalFeatLevels.value this)}}
+            <tr>
+                <td>INSERT GENERAL FEAT HERE</td>
+            </tr>
+            {{/if}}
+            {{#if (contains @root.actor.class.system.skillFeatLevels.value this)}}
+            <tr>
+                <td>INSERT SKILL FEAT HERE</td>
+            </tr>
+            {{/if}}
+            {{#if (contains @root.actor.class.system.skillIncreaseLevels.value this)}}
+            <tr>
+                <td>INSERT SKILL INCREASES HERE</td>
+            </tr>
+            {{/if}}
+            {{#if (contains @root.ability_boosts this)}}
+            <tr class="ability-boost-select">
+                <td>Select 4 Boosts:</td>
+                <td>
+                    <input type="checkbox" id="dex" name="dex">
+                    <label for="dex">DEX.</label>
+                    <input type="checkbox" id="str" name="str">
+                    <label for="str">STR.</label>
+                    <input type="checkbox" id="con" name="con">
+                    <label for="con">CON.</label>
+                    <input type="checkbox" id="wis" name="wis">
+                    <label for="wis">WIS.</label>
+                    <input type="checkbox" id="int" name="int">
+                    <label for="int">INT.</label>
+                    <input type="checkbox" id="cha" name="cha">
+                    <label for="cha">CHA.</label>
+                </td>
+            </tr>
+            {{/if}}
+        </table>
+    </section>
+    {{/each}}
+</section>

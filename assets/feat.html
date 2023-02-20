@@ -1,0 +1,19 @@
+<form>
+    <section class="content browser active" style="display: block;">
+      <div class="spell-browser" style="display: flex; flex: 1 1 0">
+        <ul class="item-list result-list">
+            {{#each feats}}
+            <li class="item flexrow" data-document-id="{{this._id}}" data-type="Item" draggable="true">
+                <div class="image preview-feat" data-document-id="{{this._id}}" >
+                    <img class src={{this.img}} title="{{this.name}}" width="32" height="32" loading="lazy">
+                </div>
+                <div class="name preview-feat" data-document-id="{{this._id}}" >
+                    <a class="item-link">{{this.name}}</a>
+                </div>
+                <button type="button" class="chosen-feat" data-document-id="{{this._id}}">Select Feat</button>
+            </li>
+            {{/each}}
+        </ul>
+      </section>
+    </section>
+  </form>

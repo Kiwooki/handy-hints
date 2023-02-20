@@ -175,7 +175,7 @@ Hooks.on("preUpdateItem", ( itemPF2E ) => {
     }
 
     // TODO item interactions e.g. Sheath / Draw
-    endMovement()
+    CurrentActor.endMovement()
     console.log("Item interaction")
     console.log(itemPF2E)
 });
@@ -246,8 +246,8 @@ Hooks.on("renderCharacterSheetPF2e", (character_sheet, character_html, css_class
 
     // register an event listener for this button
     character_html.on('click', '.character-creator-button', (event) => {
-        const userId = $(event.currentTarget).parents('[data-user-id]')?.data()?.userId;
-        new CharacterCreator(character_sheet).render(true, { 
+        // const userId = $(event.currentTarget).parents('[data-user-id]')?.data()?.userId;
+        new CharacterCreator(character_sheet, game.userId).render(true, { 
             width: 750,
             height: 800
         })

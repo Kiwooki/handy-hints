@@ -18,6 +18,8 @@
         <section class="tab compendium directory" data-tab="{{label}}" data-group="primary-tabs">
           {{#if ancestry}}
             {{> 'modules/handy-hints/assets/ancestry.html' this}}
+          {{else if heritage}}
+            {{> 'modules/handy-hints/assets/heritage.html' this}}
           {{else if background}}
             {{> 'modules/handy-hints/assets/background.html' this}}
           {{else if class}}
