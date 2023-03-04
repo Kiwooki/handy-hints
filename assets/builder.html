@@ -35,9 +35,9 @@
             </tr>
             {{/each}}
             {{#each @root.actor.ancestry.system.items}}
-            <tr class="ancestry-feat" data-id="{{this.uuid}}">
+            <tr class="ancestry-feature" data-id="{{this.uuid}}">
                 <a href="#">
-                    <td>Ancestry Feat</td>
+                    <td>Ancestry Feature</td>
                     <td><em>{{this.name}}</em></td>
                 </a>
             </tr>
@@ -174,12 +174,12 @@
                 <th>Value</th>
             </tr>
             {{#each @root.actor.class.system.items}}
-            {{#ifCond this.level 1}}
+            {{#ifCompare this.level 1}}
             <tr>
                 <td>Class Feature</td>
                 <td>{{this.name}}</td>
             </tr>
-            {{/ifCond}}
+            {{/ifCompare}}
             {{/each}}
         </table>
     </section> -->
@@ -192,41 +192,98 @@
                 <th>Value</th>
             </tr>
             {{#each @root.actor.class.system.items}}
-                {{#ifCond this.level @../this}}
+                {{#ifCompare this.level @../this}}
                 <tr class="class-feature" data-id="{{this.uuid}}">
                     <td>Class Feature</td>
                     <td><em>{{this.name}}</em></td>
                 </tr>
-                {{/ifCond}}
+                {{/ifCompare}}
             {{/each}}
             {{#if (contains @root.actor.class.system.ancestryFeatLevels.value this)}}
-            <tr class="ancestry-feat-select" data-id="{{@root.actor.ancestry._id}}"> 
-                <!-- TODO if empty -->
-                <a href="#">
-                    <td>Ancestry Feat</td>
-                    <td>_Pick Ancestry Feat_</td>
-                    <!-- <td>INSERT ANCESTRY FEAT HERE IF ALREADY SELECTED</td> -->
-                </a>
-            </tr>
+                {{#if (hasfeat @root.actor.feats "ancestry" this)}}
+                    <tr class="ancestry-feat" data-id="{{getfeatID @root.actor.feats 'ancestry' this}}">
+                        <td>Ancestry Feat</td>
+                        <td><em>{{getfeatName @root.actor.feats "ancestry" this}}</em></td>
+                    </tr>
+                {{else}}
+                    <tr class="pick-new-feat-select" data-id="{{this}}" data-class-level="{{this}}" data-feat-type="ancestry">
+                        <a href="#">
+                            <td>Ancestry Feat</td>
+                            <td>_Pick Ancestry Feat_</td>
+                        </a>
+                    </tr>
+                {{/if}}
             {{/if}}
             {{#if (contains @root.actor.class.system.classFeatLevels.value this)}}
-            <tr>
-                <td>INSERT CLASS FEAT HERE</td>
-            </tr>
+                {{#if (hasfeat @root.actor.feats "class" this)}}
+                    <tr class="class-feat" data-id="{{getfeatID @root.actor.feats 'class' this}}">
+                        <td>Class Feat</td>
+                        <td><em>{{getfeatName @root.actor.feats "class" this}}</em></td>
+                    </tr>
+                {{else}}
+                    <tr class="pick-new-feat-select" data-id="{{this}}" data-class-level="{{this}}" data-feat-type="class">
+                        <a href="#">
+                            <td>Class Feat</td>
+                            <td>_Pick Class Feat_</td>
+                        </a>
+                    </tr>
+                {{/if}}
+            {{/if}}
+            {{#if (contains @root.actor.class.system.classFeatLevels.value this)}}
+                {{#if (gt this 1)}}
+                    {{#if (hasfeat @root.actor.feats "archetype" this)}}
+                        <tr class="archetype-feat" data-id="{{getfeatID @root.actor.feats 'archetype' this}}">
+                            <td>Archetype Feat</td>
+                            <td><em>{{getfeatName @root.actor.feats "archetype" this}}</em></td>
+                        </tr>
+                    {{else}}
+                        <tr class="pick-new-feat-select" data-id="{{this}}" data-class-level="{{this}}" data-feat-type="archetype">
+                            <a href="#">
+                                <td>Archetype Feat</td>
+                                <td>_Pick Archetype Feat_</td>
+                            </a>
+                        </tr>
+                    {{/if}}
+                {{/if}}
             {{/if}}
             {{#if (contains @root.actor.class.system.generalFeatLevels.value this)}}
-            <tr>
-                <td>INSERT GENERAL FEAT HERE</td>
-            </tr>
+                {{#if (hasfeat @root.actor.feats "general" this)}}
+                    <tr class="general-feat" data-id="{{getfeatID @root.actor.feats 'general' this}}">
+                        <td>General Feat</td>
+                        <td><em>{{getfeatName @root.actor.feats "general" this}}</em></td>
+                    </tr>
+                {{else}}
+                    <tr class="pick-new-feat-select" data-id="{{this}}" data-class-level="{{this}}" data-feat-type="general">
+                        <a href="#">
+                            <td>General Feat</td>
+                            <td>_Pick General Feat_</td>
+                        </a>
+                    </tr>
+                {{/if}}
             {{/if}}
             {{#if (contains @root.actor.class.system.skillFeatLevels.value this)}}
-            <tr>
-                <td>INSERT SKILL FEAT HERE</td>
-            </tr>
+                {{#if (hasfeat @root.actor.feats "skill" this)}}
+                    <tr class="skill-feat" data-id="{{getfeatID @root.actor.feats 'skill' this}}">
+                        <td>Skill Feat</td>
+                        <td><em>{{getfeatName @root.actor.feats "skill" this}}</em></td>
+                    </tr>
+                {{else}}
+                    <tr class="pick-new-feat-select" data-id="{{this}}" data-class-level="{{this}}" data-feat-type="general">
+                        <a href="#">
+                            <td>Skill Feat</td>
+                            <td>_Pick Skill Feat_</td>
+                        </a>
+                    </tr>
+                {{/if}} 
             {{/if}}
             {{#if (contains @root.actor.class.system.skillIncreaseLevels.value this)}}
             <tr>
                 <td>INSERT SKILL INCREASES HERE</td>
+                <select>
+                    {{#each @root.actor.class.system.skills}}
+                    <option value="{{this.slug}}">{{this.slug}} {{this.breakdown}}</option>
+                    {{/each}}
+                </select>
             </tr>
             {{/if}}
             {{#if (contains @root.ability_boosts this)}}

@@ -1,6 +1,6 @@
 class FeatSelector extends FormApplication
 {
-  constructor(feats, title, callback)
+  constructor(feats, title, feat_slot, feat_type, callback)
   {
     const template_file = 'modules/handy-hints/assets/feat.html'
     const template_data = {
@@ -16,6 +16,8 @@ class FeatSelector extends FormApplication
       }
     );
     this.callback = callback
+    this.feat_slot = feat_slot
+    this.feat_type = feat_type
   }
 
   static get defaultOptions() {
@@ -30,24 +32,30 @@ class FeatSelector extends FormApplication
   activateListeners(html) {
     super.activateListeners(html);
     html.find('.preview-feat').click( async ev => {
-      console.log("ancestry feat clicked")
+      console.log("feat clicked")
       console.log(ev)
       console.log(ev.currentTarget.attributes[1].value)
       let feat_uuid = ev.currentTarget.attributes[1].value
-      let ancestry_feat = await game.packs.get("pf2e.feats-srd").get(feat_uuid)
-      ancestry_feat.sheet.render(true)
+      // not sure why it's 'get' rather than 'getDocument' here... but it is...
+      let preview_feat = await game.packs.get("pf2e.feats-srd").get(feat_uuid)
+      preview_feat.sheet.render(true)
     });
     html.find('.chosen-feat').click( async ev => {
-      console.log("ancestry feat picked")
+      console.log("feat picked")
       console.log(ev)
       console.log(ev.currentTarget.attributes[1].value)
-      this.callback(ev, "formData blah")
+      let feat_id = ev.currentTarget.attributes[1].value
+      await this.callback.selectedFeatClick(feat_id, this.feat_slot, this.feat_type)
+      this.render(false)
+      this._updateObject(ev, null)
     });
   }
 
   async _updateObject(event, formData) {
     console.log("updateObject")
-    this.callback(event, formData)
+    console.log(event)
+    console.log(formData)
+    // this.callback(event, formData)
   }
 }
 
@@ -55,7 +63,7 @@ export class CharacterCreator extends FormApplication
 {
     constructor(character_sheet, owner_id) 
     {
-      Handlebars.registerHelper('ifCond', function(v1, v2, options) {
+      Handlebars.registerHelper('ifCompare', function(v1, v2, options) {
         if(!v1 || !v2)
         {
           return false
@@ -65,7 +73,78 @@ export class CharacterCreator extends FormApplication
         }
         return options.inverse(this);
       });
-  
+      Handlebars.registerHelper('gt', function(v1, v2, options) {
+        if(!v1 || !v2)
+        {
+          return false
+        }
+        return v1 > v2
+      });
+      Handlebars.registerHelper('hasfeat', function(character_feats, category, level, options) {
+        if(!character_feats || !category || !level)
+        {
+          return false
+        }
+        const feat_category = character_feats.get(category)
+        if(!feat_category?.feats)
+        {
+          console.log("no feat for category: " + category)
+          return false
+        }
+        for( const feat of feat_category.feats )
+        {
+          console.log(feat)
+          if(feat.level == level && feat?.feat)
+          {
+            console.log("found correct level")
+            console.log(feat.feat)
+            return true
+          }
+        }
+        return false
+      });
+      Handlebars.registerHelper('getfeatName', function(character_feats, category, level, options) {
+        if(!character_feats || !category || !level)
+        {
+          return "BLANK"
+        }
+        const feat_category = character_feats.get(category)
+        if(!feat_category?.feats)
+        {
+          console.log("feats name found for category: " + category)
+          return "FEAT NOT FOUND"
+        }
+        for( const feat of feat_category.feats )
+        {
+          console.log(feat)
+          if(feat.level == level && feat?.feat)
+          {
+            return feat.feat.name
+          }
+        }
+        return "FEAT NAME FOUND"
+      });
+      Handlebars.registerHelper('getfeatID', function(character_feats, category, level, options) {
+        if(!character_feats || !category || !level)
+        {
+          return "BLANK"
+        }
+        const feat_category = character_feats.get(category)
+        if(!feat_category?.feats)
+        {
+          console.log("feats not found for category: " + category)
+          return "FEAT NOT FOUND"
+        }
+        for( const feat of feat_category.feats )
+        {
+          console.log(feat)
+          if(feat.level == level && feat?.feat)
+          {
+            return feat.feat.sourceId // .id only returns the ITEM Id not the Source ID for compendium lookup
+          }
+        }
+        return "FEAT ID FOUND"
+      });
       const template_file = "modules/handy-hints/assets/myFormApplication.html";
 
       console.log("try load the compendium content to get ancestries, background, and classes")
@@ -74,10 +153,6 @@ export class CharacterCreator extends FormApplication
       // const feats_compendium = game.packs.get("pf2e.feats-srd")
       const background_compendium = game.packs.get("pf2e.backgrounds")
       const class_compendium = game.packs.get("pf2e.classes")
-      // for( const feat_entry of feats_compendium.index )
-      // {
-      //   let feat = game.packs.get("pf2e.feats-srd").getDocument(feat_entry._id)
-      // }
 
       loadTemplates([
         "modules/handy-hints/assets/sidebar.html", 
@@ -85,7 +160,7 @@ export class CharacterCreator extends FormApplication
         "modules/handy-hints/assets/heritage.html", 
         "modules/handy-hints/assets/background.html", 
         "modules/handy-hints/assets/class.html", 
-        "modules/handy-hints/assets/level.html"]);
+        "modules/handy-hints/assets/builder.html"]);
       let ability_boosts = [5,10, 15,20] // fixed for all actors
       const template_data = { title: "Handlebars header text.",
                               chosen_ancestry: "drag choice here",
@@ -135,10 +210,6 @@ export class CharacterCreator extends FormApplication
       }
     
       _onDragStart( event ) {
-        // if(!event.currentTarget.classList.contains("ancestry-row"))
-        // {
-        //   super._onDragStart(event);
-        // }
 
         if(event.currentTarget.classList.contains("ancestry-row"))
         {
@@ -231,8 +302,27 @@ export class CharacterCreator extends FormApplication
           console.log(ev)
           console.log(ev.currentTarget.attributes[1].value)
           let feat_uuid = ev.currentTarget.attributes[1].value.split(".")[3]
+          console.log("feat uuid: " + feat_uuid)
           let background_feat = await game.packs.get("pf2e.feats-srd").getDocument(feat_uuid)
           background_feat.sheet.render(true)
+        });
+        html.find('.class-feat').click( async ev => {
+          console.log("class feat clicked")
+          console.log(ev)
+          console.log(ev.currentTarget.attributes[1].value)
+          let feat_uuid = ev.currentTarget.attributes[1].value.split(".")[3]
+          console.log("feat uuid: " + feat_uuid)
+          let class_feat = await game.packs.get("pf2e.feats-srd").getDocument(feat_uuid)
+          class_feat.sheet.render(true)
+        });
+        html.find('.archetype-feat').click( async ev => {
+          console.log("archetype feat clicked")
+          console.log(ev)
+          console.log(ev.currentTarget.attributes[1].value)
+          let feat_uuid = ev.currentTarget.attributes[1].value.split(".")[3]
+          console.log("feat uuid: " + feat_uuid)
+          let archetype_feat = await game.packs.get("pf2e.feats-srd").getDocument(feat_uuid)
+          archetype_feat.sheet.render(true)
         });
         html.find('.class-feature').click( async ev => {
           console.log("class feature clicked")
@@ -242,33 +332,68 @@ export class CharacterCreator extends FormApplication
           let class_feature = await game.packs.get("pf2e.classfeatures").getDocument(feature_uuid)
           class_feature.sheet.render(true)
         });
-        html.find('.ancestry-feat').click( async ev => {
-          console.log("ancestry feat clicked")
+        html.find('.ancestry-feature').click( async ev => {
+          console.log("ancestry feature clicked")
           console.log(ev)
           console.log(ev.currentTarget.attributes[1].value)
-          let feat_uuid = ev.currentTarget.attributes[1].value.split(".")[3]
-          let ancestry_feat = await game.packs.get("pf2e.ancestryfeatures").getDocument(feat_uuid)
-          ancestry_feat.sheet.render(true)
+          let feature_uuid = ev.currentTarget.attributes[1].value.split(".")[3]
+          let ancestry_feature = await game.packs.get("pf2e.ancestryfeatures").getDocument(feature_uuid)
+          ancestry_feature.sheet.render(true)
         });
-        html.find('.ancestry-feat-select').click( async ev => {
-          // let selected_level = ev.currentTarget.attributes[1].value
+        html.find('.ancestry-feat').click( async ev => {
+          let feat_uuid = ev.currentTarget.attributes[1].value.split(".")[3]
+          let preview_feat = await game.packs.get("pf2e.feats-srd").getDocument(feat_uuid)
+          preview_feat.sheet.render(true)
+        });
+        html.find('.pick-new-feat-select').click( async ev => {
           // use the ev to pass which level this is for instead
-          let tmp_ancestry = this.ancestry
+          let current_level = ev.currentTarget.attributes[1].value
+          let feat_type = ev.currentTarget.attributes[3].value
+          console.log(ev)
+          let feat_slot = this.class.system.classFeatLevels.value.indexOf(parseInt(current_level))
+          // lookup feat_slot
+          let tmp_type_sel = null
+          if( feat_type == "ancestry")
+          {
+            tmp_type_sel = this.ancestry
+          }
+          else if( feat_type == "background")
+          {
+            tmp_type_sel = this.background
+          }
+          else if(feat_type == "class")
+          {
+            tmp_type_sel = this.class
+          }
+          else if( feat_type == "archetype")
+          {
+            // tmp_type_sel = this.background
+          }
+          else if( feat_type == "skill")
+          {
+            // tmp_type_sel = this.background
+          }
           let feats = []
           for( const feat_entry of this.feat_compendium.index)
           {
             let feat = await this.feat_compendium.getDocument(feat_entry._id)
-            if(feat.system.featType.value === "ancestry")
+            if(feat.system.featType.value === feat_type)
             {
-              if(feat.system.traits.value.includes(tmp_ancestry.system.traits.value[0]))
+              if(feat.system.traits.value.includes(tmp_type_sel?.system?.slug) || 
+                (feat_type == "ancestry" && feat.system.traits.value.includes(this.heritage.system.slug)) ||
+                (feat_type == "general" && feat.system.traits.value.includes("general")) ||
+                (feat_type == "skill" && feat.system.traits.value.includes("skill")) )
               {
-                feats.push(feat) // TODO check level is correct
+                if( feat.system.level.value == current_level)
+                {
+                  feats.push(feat)
+                }
               }
             }
           }
 
           // make this much smaller - window sized
-          new FeatSelector(feats, "Select Ancestry Feat", this.selectedFeatClick).render(true, { 
+          new FeatSelector(feats, "Select " + feat_type + "Feat", feat_slot + 1, feat_type, this).render(true, { 
             width: 400,
             height: 400
           })
@@ -320,10 +445,12 @@ export class CharacterCreator extends FormApplication
         });
       }
     
-      async selectedFeatClick(event, formData)
+      async selectedFeatClick(feat_id, feat_slot, feat_type)
       {
-        console.log(event)
-        console.log(formData)
+        let feat = await game.packs.get("pf2e.feats-srd").get( feat_id )
+        const feat_source = feat.toObject() // the toObject() was important to getting the location set correctly
+        feat_source.system.location = feat_type + "-" + feat_slot.toString()
+        let item_response = await this.character_sheet.actor.createEmbeddedDocuments("Item", [feat_source] )
       }
 
       async _updateObject(event, formData) {
@@ -358,14 +485,15 @@ export class CharacterCreator extends FormApplication
         // this.character_sheet.actor.ancestry = this.ancestry
         options_data.actor = this.character_sheet.actor
         // set example level to 5
-        let levels = Array.from({length: 5}, (_, index) => index + 1);
+        let char_level = this.character_sheet.actor.level
+        let levels = Array.from({length: char_level}, (_, index) => index + 1);
         options_data.tabs.push(
           { 
-            label: "level",
-            title: "Level",
+            label: "builder",
+            title: "Builder",
             character_level: levels,
             content: "<em>Fancy Level content.</em>",
-            level: true,
+            builder: true,
             // actor: this.character_sheet.actor
           }
         )
