@@ -1,38 +1,70 @@
 <section class="sheet-body">
-    {{#each ancestries}}
-    <section class="flexrow ancestry-row" data-document-id={{this._id}} title="{{this.name}}" style="border: 1px solid;" draggable="true">
-        <div class="flexcol">
-            <button class="ancestry-selected" type="button" doc-id="{{this._id}}">
-                <img class="thumbnail" style="width: 50%; border: 0;" src={{this.img}}>
-            </button>
-        </div>
-        <div style="display: block">
-            <table>
-                <tr>
-                    <th>{{this.name}}</th>
-                </tr>
-            </table>
-        </div>
-        <!-- <div class="flexcol">
-            <a>HP: </a>
-            <a>Size: </a>
-            <a>Speed: </a>
-        </div>
-        <div class="flexcol">
-            <a>Boost: </a>
-            <a>Boost: </a>
-            <a>Flaw: </a>
-        </div>
-        <div class="flexcol">
-            <a>Languages: </a>
-            <a>Senses: </a>
-        </div>
-        <div class="flexcol">
-            <a>Heritage: </a>
-        </div>
-        <div class="flexcol">
-            <a>Feat: </a>
-        </div> -->
+    <h3>Ancestry</h3>
+
+    <button class="open_compendium" data-comp-name="pf2e.ancestries" data-opt-type="Ancestry" type="button">Pick Ancestry</button>
+    <button class="option-picker-create" data-comp-name="heritages" data-opt-type="Heritage" type="button">Pick Heritage</button>
+
+    <!-- Ancestry Summary -->
+    <button type="button" class="level-accordion">Summary - Ancestry: {{@root.actor.ancestry.name}}</button>
+    <section style="display: none;">
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Ancestry HP</td>
+                <td>{{@root.actor.ancestry.system.hp}}</td>
+            </tr>
+            {{#each @root.actor.ancestry.system.boosts}}
+            <tr>
+                <td>Provided Boost Options</td>
+                <td>
+                    <select>
+                        {{#each this.value}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </td>
+            </tr>
+            {{/each}}
+            {{#each @root.actor.ancestry.system.flaws}}
+            <tr>
+                <td>Flaw</td>
+                <td>
+                    <select>
+                        {{#each this.value}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </td>
+            </tr>
+            {{/each}}
+            {{#each @root.actor.ancestry.system.items}}
+            <tr class="preview_option" data-document-id="{{this.uuid}}" data-comp-name="ancestryfeatures">
+                <a href="#">
+                    <td>Ancestry Feature</td>
+                    <td><em>{{this.name}}</em></td>
+                </a>
+            </tr>
+            {{/each}}
+            <tr>
+                <td>Languages Known</td>
+                <td>{{@root.actor.ancestry.system.languages.value}}</td>
+            </tr>
+            <tr>
+                <td>Speed</td>
+                <td>{{@root.actor.ancestry.system.speed}}</td>
+            </tr>
+            <tr>
+                <td>Size</td>
+                <td>{{@root.actor.ancestry.system.size}}</td>
+            </tr>
+        </table>
     </section>
-    {{/each}}
+    <!-- Heritage Summary -->
+    <button type="button" class="level-accordion">Summary - Heritage: {{@root.actor.heritage.name}}</button>
+    <section style="display: none;">
+        {{{enrichHTML @root.actor.heritage.system.description.value}}}
+    </section>
 </section>
